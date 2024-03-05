@@ -5,7 +5,7 @@
 </div>
 
 <script>
-    const counterElement = document.getElementById('odometer');
+    const counterElement = document.getElementById('odometer') as HTMLDivElement;
   
     const ws = new WebSocket('ws://localhost:3000/counter');
   
@@ -30,8 +30,7 @@
         defaultDigitNode.innerHTML += `${i}<br>`;
     }
   
-    // Store digit elements in an array
-    const digits = [];
+    const digits : HTMLElement[] = []
   
     // Set the value of the odometer
     const setValue = (number) => {
