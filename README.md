@@ -1,16 +1,14 @@
-# Astro Starter Kit: Basics
+# Shorvan: A Fast Link Shortener 🚀
 
-```sh
-npm create astro@latest -- --template basics
-```
+Welcome to **Shorvan**! This is a super-fast link shortener app designed to showcase real-time functionalities using WebSockets, the power of local storage, and the simplicity and speed of Astro. Shorvan is a project I created as a learning journey, exploring technologies I've never used before. I've incorporated Astro with Vanilla JavaScript/TypeScript for the frontend, and for the backend, I've spun up a separate project utilizing Bun, Elysia, and Turso.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+- Backend Project: [Shorvan Backend](enlace)
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Features 🌟
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+- **Link Shortening:** Quickly shorten your long URLs.
+- **Real-Time Updates:** Watch the number of shortened links update in real-time with WebSockets.
+- **Persistence:** Your shortened links are saved locally using localStorage, so they're always at hand.
 
 ## 🚀 Project Structure
 
