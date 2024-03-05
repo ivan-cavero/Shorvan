@@ -1,0 +1,101 @@
+<div class="flex flex-col items-center gap-4">
+    <div class="container flex justify-center items-center w-full">
+        <div class="number-ticker" id="odometer" data-value="0"></div>
+    </div>
+</div>
+
+<script>
+    const counterElement = document.getElementById('odometer');
+  
+    const ws = new WebSocket('ws://localhost:3000/counter');
+  
+    // Handle incoming WebSocket messages
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        // Set the odometer value
+        setValue(data.count.count);
+        // Show the odometer element
+        counterElement.classList.remove('hidden');
+    };
+  
+    // Handle WebSocket errors (e.g., connection failure)
+    ws.onerror = () => {
+        counterElement.classList.add('hidden');
+    };
+  
+    // Prepare a single digit element for reuse
+    const defaultDigitNode = document.createElement('div');
+    defaultDigitNode.classList.add('digit');
+    for (let i = 0; i < 10; i++) {
+        defaultDigitNode.innerHTML += `${i}<br>`;
+    }
+  
+    // Store digit elements in an array
+    const digits = [];
+  
+    // Set the value of the odometer
+    const setValue = (number) => {
+        const currentValue = parseInt(number, 10) || 0;
+        const stringValue = currentValue.toString().split('').reverse().join('');
+        const lengthNeeded = stringValue.length;
+  
+        // Generate additional digits if necessary
+        if (lengthNeeded > digits.length) {
+            generateDigits(lengthNeeded - digits.length);
+        }
+  
+        // Update each digit
+        digits.forEach((digit, index) => {
+            const number = stringValue[index] || 0;
+            setDigit(index, number);
+        });
+    }
+  
+    // Set the display of a single digit
+    const setDigit = (digitIndex, number) => {
+        digits[digitIndex].style.marginTop = `-${number}em`;
+    }
+  
+    // Generate and prepend new digit elements
+    const generateDigits = (amount) => {
+        for (let i = 0; i < amount; i++) {
+            const digitNode = defaultDigitNode.cloneNode(true);
+            counterElement.appendChild(digitNode);
+            digits.unshift(digitNode); // Add to the beginning of the array
+        }
+    }
+  
+    // Initialize the odometer with a starting value or 0
+    setValue(counterElement.getAttribute('data-value'));
+</script>
+
+<style is:inline>
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.number-ticker {
+    overflow: hidden;
+    height: 1em;
+    font-size: 2.25rem;
+    font-weight: bold;
+    letter-spacing: -0.05em;
+    color: #f9fafb;
+}
+
+@media (min-width: 640px) {
+    .number-ticker {
+        font-size: 4rem;
+    }
+}
+
+.digit {
+    float: left;
+    line-height: 1;
+    transition: margin-top 1.75s ease;
+    padding: 0 0.075em;
+}
+</style>
