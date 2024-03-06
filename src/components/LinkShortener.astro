@@ -52,6 +52,9 @@
 
 
     window.onload = () => {
+        const inputElement = document.querySelector('input[name="url"]') as HTMLInputElement;
+        inputElement.focus();
+
         linksContainer.innerHTML = '';
         const savedLinks = JSON.parse(localStorage.getItem('savedLinks') || '[]');
         savedLinks.forEach((link: string) => {
