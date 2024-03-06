@@ -1,48 +1,33 @@
+---
+import LinksDisplay from './LinksDisplay.astro';
+---
+
 <form method="POST" class="flex items-center gap-2 mt-4 w-full max-w-[450px]">
-    <input
-        type="text"
-        name="url"
-        required
-        pattern="http*://.*"
-        class="w-full flex-1 p-2 text-sm placeholder-gray-500 border rounded-md focus:outline-none border-gray-600 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100"
-        placeholder="Enter a link"
-    />
-    <button class="shrink-0 p-2 text-sm font-medium text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-400 dark:hover:bg-indigo-500">
-     Generate
+    <div class="flex items-center bg-white bg-opacity-20 rounded-lg backdrop-blur-sm shadow-lg w-full h-10">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-3 text-white">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <input
+            type="text"
+            name="url"
+            required
+            style="outline: none; box-shadow: none; border: none;"
+            class="bg-transparent w-full text-white placeholder-gray-300"
+            placeholder="Enter a URL"
+        />    
+    </div>
+    <button class="shrink-0 h-10 p-2 text-sm font-medium text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ">
+        Generate
     </button>   
 </form>
-<div id="linksContainer" class="mt-4 space-y-2">
-    <!-- Los enlaces generados se añadirán aquí -->
-</div>
+<LinksDisplay />
+
 
 <script>
     const form = document.querySelector('form') as HTMLFormElement;
-    const linksContainer = document.getElementById('linksContainer') as HTMLDivElement;
 
-    // Función para añadir enlace al contenedor y al localStorage
     function addLinkToContainer(shortUrl: string) {
-        const fullUrl = `http://localhost:3000/${shortUrl}`;
-        
-        const linkElement = document.createElement('div');
-        linkElement.className = "flex justify-between items-center bg-gray-800 p-2 rounded-lg";
-
-        const linkText = document.createElement('p');
-        linkText.className = "link text-gray-100 flex-1";
-        linkText.textContent = fullUrl;
-
-        const copyBtn = document.createElement('button');
-        copyBtn.className = "copyBtn px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-md";
-        copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
-
-        linkElement.appendChild(linkText);
-        linkElement.appendChild(copyBtn);
-        linksContainer.appendChild(linkElement);
-
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(fullUrl);
-            alert('Link copied to clipboard');
-        });
-
         const savedLinks = JSON.parse(localStorage.getItem('savedLinks') || '[]');
         if (!savedLinks.includes(shortUrl)) {
             savedLinks.push(shortUrl);
@@ -54,12 +39,6 @@
     window.onload = () => {
         const inputElement = document.querySelector('input[name="url"]') as HTMLInputElement;
         inputElement.focus();
-
-        linksContainer.innerHTML = '';
-        const savedLinks = JSON.parse(localStorage.getItem('savedLinks') || '[]');
-        savedLinks.forEach((link: string) => {
-            addLinkToContainer(link);
-        });
     };
 
 
@@ -68,7 +47,7 @@
         const formData = new FormData(form);
         const url = formData.get('url');
 
-        fetch('http://localhost:3000/short', {
+        fetch('http://localhost:3000/short-links', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -78,8 +57,7 @@
                 shortUrl: Math.random().toString(36).substring(2, 10)
             })
         }).then(res => res.json()).then(data => {
-            console.log(data.data.short_url)
-            addLinkToContainer(data.data.short_url);
+            addLinkToContainer(data.short_url);
         }).catch((error) => {
             console.error('Error:', error);
         });
@@ -87,3 +65,14 @@
         form.reset();
     });
 </script>
+
+<style is:global>
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    border: 0;
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px #00000000 inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+</style>
