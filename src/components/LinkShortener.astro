@@ -1,7 +1,3 @@
----
-import LinksDisplay from './LinksDisplay.astro';
----
-
 <form method="POST" class="flex items-center gap-2 mt-4 w-full max-w-[450px]">
     <div class="flex items-center bg-white bg-opacity-20 rounded-lg backdrop-blur-sm shadow-lg w-full h-10">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-3 text-white">
@@ -21,33 +17,21 @@ import LinksDisplay from './LinksDisplay.astro';
         Generate
     </button>   
 </form>
-<LinksDisplay />
-
 
 <script>
     const form = document.querySelector('form') as HTMLFormElement;
-
-    function addLinkToContainer(shortUrl: string) {
-        const savedLinks = JSON.parse(localStorage.getItem('savedLinks') || '[]');
-        if (!savedLinks.includes(shortUrl)) {
-            savedLinks.push(shortUrl);
-            localStorage.setItem('savedLinks', JSON.stringify(savedLinks));
-        }
-    }
-
 
     window.onload = () => {
         const inputElement = document.querySelector('input[name="url"]') as HTMLInputElement;
         inputElement.focus();
     };
 
-
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const formData = new FormData(form);
         const url = formData.get('url');
 
-        fetch('http://localhost:3000/short-links', {
+        fetch('https://shorvan-backend.fly.dev/short-links', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -57,7 +41,7 @@ import LinksDisplay from './LinksDisplay.astro';
                 shortUrl: Math.random().toString(36).substring(2, 10)
             })
         }).then(res => res.json()).then(data => {
-            addLinkToContainer(data.short_url);
+            console.log('Success:', data);
         }).catch((error) => {
             console.error('Error:', error);
         });
