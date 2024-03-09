@@ -1,0 +1,23 @@
+---
+import Counter from "./Counter.astro";
+import LinkShortener from "./LinkShortener.astro";
+interface MainSectionProps {
+  
+}
+const {} = Astro.props;
+---
+<main class="min-h-screen flex flex-col justify-center items-center bg-gray-800 text-white">
+  <h1 class="text-3xl font-bold sm:text-5xl md:text-6xl text-gray-50">Short URL</h1>
+  <p class="text-gray-400 my-4">Simplify your links, track their performance, and witness our community grow in real-time.</p>
+  <Counter />
+  <LinkShortener />
+</main>
+
+<style>
+  main {
+    background-image: url("/src/images/blur.svg");
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+  }
+</style>

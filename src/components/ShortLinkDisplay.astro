@@ -1,0 +1,37 @@
+---
+import Notification from "./Notification.astro";
+---
+
+<div class={`short-link-container transition-opacity duration-300 opacity-0 mt-4 flex flex-col items-center w-full px-4`}>
+  <div class="w-full max-w-md rounded-lg shadow-lg bg-white bg-opacity-10 backdrop-blur-sm border border-gray-200 border-opacity-20 p-4">
+    <div class="flex justify-between items-center">
+      <div class="flex-1 min-w-0">
+        <a href="#" class="text-lg font-semibold text-blue-400 truncate" id="shortUrlContainer" target="_blank" rel="noopener noreferrer"></a>
+        <a href="#" class="text-xs text-gray-300 truncate" id="originalUrlContainer" target="_blank" rel="noopener noreferrer"></a>
+      </div>
+      <div class="flex items-center ml-4">
+        <!-- Use buttons or links for interactive elements and ensure they have the correct event handlers -->
+        <button title="Copy Link" class="p-2" id="copyButton">
+          <!-- Copy Icon -->
+          <svg aria-hidden="true" focusable="false" fill="none" class="text-white" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z"/><path d="M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<Notification message="URL copied to clipboard" />
+
+<script>
+  function copyToClipboard() {
+    const shortUrl = document.getElementById('shortUrlContainer').textContent || '';
+    if (shortUrl) {
+      navigator.clipboard.writeText(shortUrl).then(() => {
+        window.showToast();
+      }, (err) => {
+        console.error('Error copying text: ', err);
+      });
+    }
+  }
+
+  document.getElementById('copyButton').addEventListener('click', copyToClipboard);
+</script>

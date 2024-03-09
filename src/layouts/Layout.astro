@@ -16,16 +16,27 @@ const { title, description } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<title>{title}</title>
 	</head>
-	<body>
+	<body class="bg-gray-900">
 		<slot />
 	</body>
 </html>
 <style is:global>
-	main {
+	body {
 		font-family: system-ui, sans-serif;
-		background-image: url('/src/images/blur.svg');
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: cover;
+	}
+	body::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	body::-webkit-scrollbar-track {
+		background: rgba(44, 44, 44, 0.24);
+	}
+
+	body::-webkit-scrollbar-thumb {
+		background-color: rgb(110, 110, 110);
+		border-radius: 20px;
+	}
+	body::-webkit-scrollbar-thumb:hover {
+		background-color: rgb(80, 80, 80);
 	}
 </style>

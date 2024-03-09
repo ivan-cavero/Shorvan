@@ -1,18 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import Counter from '../components/Counter.astro';
-import LinkShortener from '../components/LinkShortener.astro';
+import FeatureSection from '../components/FeatureSection.astro';
 import Footer from '../components/Footer.astro';
+import MainSection from '../components/MainSection.astro';
+import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Shorvan | URL Shortener" description="Shorvan is a URL shortener that helps you shorten links. Developed by Ivan Cavero">
-    <div class="flex flex-col min-h-screen bg-gray-900 dark:bg-gray-900">
-        <main class="flex flex-1 flex-col items-center justify-center gap-4 p-4 md:gap-8 md:p-6">
-            <Header />
-            <Counter />       
-            <LinkShortener />
-        </main>
-        <Footer />
-    </div>
+  <MainSection />
+  <FeatureSection />
+  <Footer />
 </Layout>

@@ -1,3 +1,7 @@
+---
+import ShortLinkContainer from "./ShortLinkDisplay.astro";
+---
+
 <form method="POST" class="flex items-center gap-2 mt-4 w-full max-w-[450px]">
     <div class="flex items-center bg-white bg-opacity-20 rounded-lg backdrop-blur-sm shadow-lg w-full h-10">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-3 text-white">
@@ -9,7 +13,7 @@
             name="url"
             required
             style="outline: none; box-shadow: none; border: none;"
-            class="bg-transparent w-full text-white placeholder-gray-300"
+            class="bg-transparent w-full text-white placeholder-gray-300 pr-3"
             placeholder="Enter a URL"
         />    
     </div>
@@ -17,34 +21,49 @@
         Generate
     </button>   
 </form>
+<ShortLinkContainer />
 
 <script>
     const form = document.querySelector('form') as HTMLFormElement;
+    const shortLinkContainer = document.querySelector('.short-link-container') as HTMLDivElement;
 
     window.onload = () => {
         const inputElement = document.querySelector('input[name="url"]') as HTMLInputElement;
         inputElement.focus();
     };
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
         const formData = new FormData(form);
         const url = formData.get('url');
 
-        fetch('https://shorvan-backend.fly.dev/short-links', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                url: url,
-                shortUrl: Math.random().toString(36).substring(2, 10)
-            })
-        }).then(res => res.json()).then(data => {
-            console.log('Success:', data);
-        }).catch((error) => {
+        try {
+            const res = await fetch('https://shorvan-backend.fly.dev/short-links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: url, shortUrl: Math.random().toString(36).substring(2, 8) })
+            });
+
+            if (!res.ok) throw new Error('Network response was not ok.');
+
+            const data = await res.json();
+            console.log('Success:', data.url, data.short_url);
+
+             // Use dataset to update the component with new data
+            const shortUrlContainer = document.getElementById('shortUrlContainer');
+            const originalUrlContainer = document.getElementById('originalUrlContainer');
+            
+            shortUrlContainer.textContent = window.location.origin + '/' + data.short_url;
+            shortUrlContainer?.setAttribute('href', data.short_url);
+            originalUrlContainer.textContent = url;
+
+            // Show the short link container
+            shortLinkContainer.classList.add('opacity-100');
+        } catch (error) {
             console.error('Error:', error);
-        });
+        }
 
         form.reset();
     });

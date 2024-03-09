@@ -5,66 +5,80 @@
 </div>
 
 <script>
+    let ws: WebSocket;
+
     const counterElement = document.getElementById('odometer') as HTMLDivElement;
-  
-    const ws = new WebSocket('wss://shorvan-backend.fly.dev/short-links/ws-count');
-  
-    // Handle incoming WebSocket messages
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        // Set the odometer value
-        setValue(data.count);
-        // Show the odometer element
-        counterElement.classList.remove('hidden');
+
+    const connectWebSocket = () => {
+        ws = new WebSocket('wss://shorvan-backend.fly.dev/short-links/ws-count');
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setValue(data.count);
+            counterElement.classList.remove('hidden');
+        };
+
+        ws.onerror = () => {
+            counterElement.classList.add('hidden');
+        };
     };
-  
-    // Handle WebSocket errors (e.g., connection failure)
-    ws.onerror = () => {
-        counterElement.classList.add('hidden');
+
+    const disconnectWebSocket = () => {
+        if (ws) {
+            ws.close();
+        }
     };
-  
-    // Prepare a single digit element for reuse
-    const defaultDigitNode = document.createElement('div');
-    defaultDigitNode.classList.add('digit');
-    for (let i = 0; i < 10; i++) {
-        defaultDigitNode.innerHTML += `${i}<br>`;
-    }
-  
-    const digits : HTMLElement[] = []
-  
-    // Set the value of the odometer
+
+    connectWebSocket();
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            connectWebSocket();
+        } else {
+            disconnectWebSocket();
+        }
+    });
+
     const setValue = (number) => {
         const currentValue = parseInt(number, 10) || 0;
         const stringValue = currentValue.toString().split('').reverse().join('');
         const lengthNeeded = stringValue.length;
-  
+
         // Generate additional digits if necessary
         if (lengthNeeded > digits.length) {
             generateDigits(lengthNeeded - digits.length);
         }
-  
+
         // Update each digit
         digits.forEach((digit, index) => {
             const number = stringValue[index] || 0;
             setDigit(index, number);
         });
-    }
-  
-    // Set the display of a single digit
+    };
+
+    // Function to display a single digit
     const setDigit = (digitIndex, number) => {
         digits[digitIndex].style.marginTop = `-${number}em`;
-    }
-  
-    // Generate and prepend new digit elements
+    };
+
+    const digits : HTMLElement[] = []
+
     const generateDigits = (amount) => {
         for (let i = 0; i < amount; i++) {
             const digitNode = defaultDigitNode.cloneNode(true);
             counterElement.appendChild(digitNode);
             digits.unshift(digitNode); // Add to the beginning of the array
         }
+    };
+
+    // Prepare a single digit element for reuse
+    const defaultDigitNode = document.createElement('div');
+    defaultDigitNode.classList.add('digit');
+    for (let i = 0; i < 10; i++) {
+        defaultDigitNode.innerHTML += `${i}<br>`;
     }
-  
-    // Initialize the odometer with a starting value or 0
+
+    // Initialize the counter with a starting value or 0
     setValue(counterElement.getAttribute('data-value'));
 </script>
 

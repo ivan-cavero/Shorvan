@@ -1,0 +1,28 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+const { shortUrl } = Astro.params;
+---
+
+<Layout title="Shorvan | URL Shortener" description="Shorvan is a URL shortener that helps you shorten links. Developed by Ivan Cavero">
+  <div class="flex h-screen bg-gray-900 text-white">
+    <div class="m-auto text-center" id="redirectMessage" data-shorturl={shortUrl}>
+      <p class="text-xl font-semibold">Redirecting...</p>
+      <p class="text-gray-400">You will be redirected shortly.</p>
+    </div>
+  </div>
+  <script type="module">
+    async function fetchOriginalUrl() {
+      const shortUrl = document.getElementById('redirectMessage').getAttribute('data-shorturl');
+      try {
+        const response = await fetch(`http://localhost:3000/short-link/${shortUrl}`);
+        if (!response.ok) throw new Error('Not found');
+        const data = await response.json();
+        window.location.href = data.url;
+      } catch (error) {
+        document.getElementById('redirectMessage').innerHTML = `<p class="text-xl font-semibold text-red-500">URL not found.</p>`;
+      }
+    }
+    fetchOriginalUrl();
+  </script>
+</Layout>

@@ -1,0 +1,35 @@
+---
+const { message, duration = 3000 } = Astro.props;
+---
+<div id="toastNotification" class="toast" data-duration={duration} style="display: none;">
+  {message}
+</div>
+
+<script>
+  window.showToast = function() {
+    const toast = document.getElementById('toastNotification');
+    const duration = parseInt(toast.getAttribute('data-duration'), 10);
+
+    toast.style.display = 'block';
+    toast.style.opacity = 1;
+    setTimeout(() => {
+      toast.style.opacity = 0;
+      setTimeout(() => toast.style.display = 'none', 300); 
+    }, duration);
+  }
+</script>
+
+
+<style>
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+  }
+</style>
