@@ -1,0 +1,45 @@
+---
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title}</title>
+		{import.meta.env.MODE === 'production' && <script defer src="https://eu.umami.is/script.js" data-website-id="e6c6496f-8735-4583-a5c3-890314f44d3d" />}
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+<style is:global>
+	body {
+		font-family: system-ui, sans-serif;
+	}
+	body::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	body::-webkit-scrollbar-track {
+		background: rgba(44, 44, 44, 0.24);
+	}
+
+	body::-webkit-scrollbar-thumb {
+		background-color: rgb(110, 110, 110);
+		border-radius: 20px;
+	}
+	body::-webkit-scrollbar-thumb:hover {
+		background-color: rgb(80, 80, 80);
+	}
+</style>

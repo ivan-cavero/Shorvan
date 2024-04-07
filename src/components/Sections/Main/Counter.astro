@@ -1,0 +1,127 @@
+<div class="flex flex-col items-center gap-4">
+    <div class="container flex justify-center items-center w-full">
+        <div class="number-ticker" id="odometer" data-value="0"></div>
+    </div>
+</div>
+
+<script>
+    // Initialize WebSocket connection
+    let ws: WebSocket;
+    const counterElement = document.getElementById('odometer');
+
+    // Initialize an empty array for digits
+    let digits = [];
+
+    // Function to create a default digit element
+    const createDefaultDigitNode = () => {
+        const node = document.createElement('div');
+        node.classList.add('digit');
+        for (let i = 0; i < 10; i++) {
+            node.innerHTML += `${i}<br>`;
+        }
+        return node;
+    };
+
+    // Ensure the counter has the correct number of digits
+    const adjustDigits = (lengthNeeded) => {
+        const currentLength = digits.length;
+        if (lengthNeeded > currentLength) {
+            for (let i = 0; i < lengthNeeded - currentLength; i++) {
+                const digitNode = createDefaultDigitNode();
+                // Add the new digit at the beginning to maintain the correct order
+                counterElement.prepend(digitNode);
+                digits.unshift(digitNode);
+            }
+        } else if (lengthNeeded < currentLength) {
+            for (let i = 0; i < currentLength - lengthNeeded; i++) {
+                counterElement.removeChild(digits[0]);
+                digits.shift();
+            }
+        }
+    };
+
+    // Function to animate digits
+    const animateDigit = (digitIndex, finalNumber) => {
+        let currentNumber = 0;
+        const step = () => {
+            if (currentNumber <= finalNumber) {
+                // "Animate" by changing the top margin to simulate the animation
+                digits[digitIndex].style.marginTop = `-${currentNumber * 1}em`;
+                currentNumber++;
+                requestAnimationFrame(step);
+            }
+        };
+        step();
+    };
+
+    // Function to set the counter's value
+    const setValue = (number) => {
+        const stringValue = number.toString();
+        const lengthNeeded = stringValue.length;
+
+        adjustDigits(lengthNeeded);
+
+        // Animate each digit from "0" to its final value
+        stringValue.split('').forEach((num, index) => {
+            const finalNumber = parseInt(num, 10);
+            animateDigit(index, finalNumber);
+        });
+    };
+
+    // Connect to the WebSocket and setup event handlers
+    const connectWebSocket = () => {
+        ws = new WebSocket('wss://shorvan-backend.fly.dev/short-links/ws-count');
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setValue(data.count);
+            counterElement.classList.remove('hidden');
+        };
+
+        ws.onerror = () => {
+            counterElement.classList.add('hidden');
+        };
+    };
+
+    connectWebSocket();
+
+    // Handle page visibility change to reconnect WebSocket if necessary
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            connectWebSocket();
+        } else if (ws) {
+            ws.close();
+        }
+    });
+</script>
+
+<style is:inline>
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.number-ticker {
+    overflow: hidden;
+    height: 1em;
+    font-size: 2.25rem;
+    font-weight: bold;
+    letter-spacing: -0.05em;
+    color: #f9fafb;
+}
+
+@media (min-width: 640px) {
+    .number-ticker {
+        font-size: 4rem;
+    }
+}
+
+.digit {
+    float: left;
+    line-height: 1;
+    transition: margin-top 1.75s ease;
+    padding: 0 0.075em;
+}
+</style>

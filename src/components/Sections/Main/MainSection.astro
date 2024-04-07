@@ -1,0 +1,20 @@
+---
+import Counter from "./Counter.astro";
+import LinkShortener from "./LinkShortener.astro";
+---
+
+<main class="min-h-screen flex flex-col justify-center items-center bg-gray-800 text-white p-4 lg:p-8">
+  <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-50 leading-tight">Short URL</h1>
+  <p class="text-gray-400 mt-4 mb-6 text-center max-w-2xl mx-auto">Simplify your links, track their performance, and witness our community grow in real-time.</p>
+  <Counter />
+  <LinkShortener />
+</main>
+
+<style>
+  main {
+    background-image: url("/src/images/blur.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+</style>

@@ -1,0 +1,163 @@
+---
+const TITLE = "Shorvan"
+const menuItems = [
+	{
+		name: "Features",
+		subItems: [
+			{
+				name: "Advanced Analytics",
+				description: "Get insights on how your links are performing",
+				url: "#"
+			},
+			{
+				name: "QR Codes",
+				description: "Generate and share QR codes",
+				url: "#"
+			},
+			{
+				name: "Branded Links",
+				description: "Generate and share branded links",
+				url: "#"
+			},
+			{
+				name: "API",
+				description: "Get started with the Shorvan API",
+				url: "#"
+			}
+		]
+	},
+	{
+		name: "Pricing",
+		url: "#"
+	},
+	{
+		name: "Changelog",
+		url: "#"
+	}
+]
+---
+
+<header class="fixed top-0 left-0 w-full bg-gray-800 lg:bg-transparent transition-bg z-10">
+    <nav class="flex items-center justify-between max-w-7xl mx-auto p-4 lg:px-8 text-white">
+        <!-- Logo -->
+      <a href="#" class="flex items-center">
+        <img class="h-8 w-auto" src="" alt="Logo">
+        <span class="font-bold text-xl ml-2">{TITLE}</span>
+      </a>
+
+      <!-- Desktop menu -->
+      <ul class="hidden lg:flex space-x-8">
+        {menuItems.map((item) => (
+            <li class="relative group">
+                <div class="flex items-center gap-x-1 text-sm font-semibold leading-6 cursor-pointer">
+                    {item.name}
+                    {item.subItems && (
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M19 9l-7 7-7-7" />
+                        </svg>
+                    )}
+                </div>
+                {item.subItems && (
+                    <div class="absolute hidden pt-2 group-hover:block left-0 top-full justify-start ">
+                        <div class="grid w-[32rem] grid-cols-2 gap-1 p-3 rounded-lg border border-white/20 bg-white/15 backdrop-blur-sm shadow-lg">
+                            {item.subItems.map(subItem => (
+                                <a class="rounded-lg p-3 transition-colors hover:bg-white/10" href="/features/analytics">
+                                    <div class="flex items-center space-x-2">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-white">
+                                            <line x1="12" x2="12" y1="20" y2="10"></line>
+                                            <line x1="18" x2="18" y1="20" y2="4"></line>
+                                            <line x1="6" x2="6" y1="20" y2="16"></line>
+                                        </svg>
+                                        <p class="text-sm font-medium text-white">{subItem.name}</p>
+                                    </div>
+                                    <p class="mt-1 line-clamp-1 text-sm text-white">{subItem.description}</p>
+                                </a> 
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </li>
+        ))}
+    </ul>  
+
+      <!-- Right side Login/Sign up buttons -->
+      <div class="hidden lg:flex items-center">
+        <a href="#" class="text-sm font-semibold text-gray-300 hover:text-white mr-6">Log in</a>
+        <a href="#" class="px-4 py-2 border rounded-md text-sm font-semibold text-gray-100 border-gray-300 hover:bg-gray-700 hover:text-white">Sign Up</a>
+      </div>
+  
+      <!-- Mobile menu button -->
+      <button class="lg:hidden text-gray-300 hover:text-white" id="mobile-menu-button">
+        <svg class="h-5 w-5 flex-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path d="M19 9l-7 7-7-7"/>
+          </svg>
+      </button>
+    </nav>
+  
+    <!-- Mobile Menu -->
+    <div class="lg:hidden hidden" id="mobile-menu">
+      <div class="lg:hidden fixed left-0 h-screen w-screen bg-gray-800 overflow-hidden">
+        <div class="px-4 py-4 space-y-4">
+          {menuItems.map(item => (
+            <details class="group">
+              <summary class="flex justify-between items-center p-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md cursor-pointer">
+                <span>{item.name}</span>
+                {item.subItems && (
+                    <svg class="h-4 w-4 fill-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path d="M19 9l-7 7-7-7"/>
+                    </svg>
+                )}
+              </summary>
+              {item.subItems && (
+                <div class="pl-4 mt-2 space-y-2">
+                  {item.subItems.map(subItem => (
+                    <a href={subItem.url} class="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">
+                      {subItem.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </details>
+          ))}
+          <div class="pt-4 border-t border-gray-700">
+            <a href="#" class="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">Log in</a>
+            <a href="#" class="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">Sign Up</a>
+          </div>
+        </div>
+      </div>
+</header>
+
+<script>
+  // Mobile menu
+  const mobileMenuButton = document.getElementById('mobile-menu-button')
+  const mobileMenu = document.getElementById('mobile-menu')
+  const toggleMobileMenu = () => {
+      const isHidden = mobileMenu.classList.contains('hidden')
+      mobileMenu.classList.toggle('hidden', !isHidden)
+  }
+
+  mobileMenuButton.addEventListener('click', toggleMobileMenu)
+  
+
+  // Make header solid on scroll clases
+  const setHeaderStyle = (add) => {
+      const header = document.querySelector('header')
+      if (add) {
+          header.classList.add('bg-gray-800', 'shadow')
+          header.classList.remove('bg-transparent')
+      } else {
+          header.classList.remove('bg-gray-800', 'shadow')
+          header.classList.add('bg-transparent')
+      }
+  }
+
+  const checkScreenAndSetHeaderStyle = () => {
+      if (window.innerWidth >= 1024) {
+          setHeaderStyle(window.scrollY > 10)
+      } else {
+          setHeaderStyle(true)
+      }
+  }
+
+  window.addEventListener('scroll', checkScreenAndSetHeaderStyle)
+</script>

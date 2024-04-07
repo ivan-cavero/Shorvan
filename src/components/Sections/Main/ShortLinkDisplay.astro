@@ -1,0 +1,127 @@
+<div id="linksPlaceholder" class="w-full" />
+
+<script>
+  const container = document.querySelector('#linksPlaceholder')
+
+  const addSingleLinkToContainer = (link) => {
+    const linkElement = document.createElement("div")
+    
+    const bubblesHtml = link.bubbles.map(bubble => {
+        return `<div class="w-auto h-3 p-2 ${bubble.hidden ? 'hidden' : ''} rounded-full shadow-sm flex items-center justify-center text-xs" style="background-color: ${bubble.color}">
+                  <p>${bubble.title}: <span class="text-white">${bubble.value}</span></p>
+                </div>`
+      })
+
+    const domain = new URL(link.url).hostname
+
+    linkElement.innerHTML = `
+        <div class="mt-8 w-full flex flex-col items-center px-4">
+          <div class="w-full max-w-md px-5 py-3 bg-white/10 rounded-lg backdrop-blur-sm shadow-lgtransform">
+            <div class="absolute right-0 top-0 transform -translate-x-5 -translate-y-1/2 flex space-x-2">
+              ${bubblesHtml}
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex-shrink-0 mr-4">
+                <img class="w-11 h-11 rounded-full" src="https://icons.duckduckgo.com/ip3/${domain}.ico" alt="Avatar">
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center">
+                  <a id="shortUrlLink" href="${window.location.origin}/${link.shortUrl}" class="text-lg text-blue-400 break-all truncate">${link.shortUrl}</a>
+                </div>
+                <p class="mt-2 text-xs text-gray-400 truncate">${link.url}</p>
+              </div>
+              <div class="flex-shrink-0 ml-4">
+                <button title="Copy Link" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition" id="copyButton">
+                  <svg class="copy-icon h-5 w-5 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z"/><path d="M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8"/>
+                  </svg>
+                  <svg class="check-icon h-5 w-5 hidden text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+    `
+
+    container.insertBefore(linkElement, container.firstChild)
+
+    // make animate slide in left for first link
+    if (container.children.length === 1) {
+        linkElement.classList.add("animate-slide-in-left")
+    }
+
+    while (container.children.length > 3) {
+        container.removeChild(container.lastChild)
+    }
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            console.log('Entry:', entry)
+
+            if (entry.isIntersecting) {
+                console.log('Element is visible:', entry.target)
+
+                const copyButton = entry.target.querySelector('#copyButton');
+                const shortUrlLink = entry.target.querySelector('#shortUrlLink') as HTMLAnchorElement
+
+                console.log('Copy Button:', copyButton)
+                console.log('Short Url Link:', shortUrlLink)
+
+                const copyLinkHandler = () => {
+                    navigator.clipboard.writeText(shortUrlLink.href)
+                    .then(() => {
+                        console.log('Link copied successfully:', shortUrlLink.href)
+
+                        const checkIcon = entry.target.querySelector('.check-icon')
+                        const copyButtonIcon = entry.target.querySelector('.copy-icon')
+
+                        if (checkIcon) {
+                            checkIcon.classList.remove('hidden')
+                            copyButtonIcon.classList.add('hidden')
+                        }
+
+                        setTimeout(() => {
+                            checkIcon?.classList.add('hidden')
+                            copyButtonIcon.classList.remove('hidden')
+                        }, 800)
+                    })
+                    .catch(err => {
+                        console.error('Error copying link:', err)
+                    })
+                }
+
+                copyButton.addEventListener('click', copyLinkHandler)
+
+                const cleanupObserver = new IntersectionObserver(cleanupEntries => {
+                    cleanupEntries.forEach(cleanupEntry => {
+                        if (!cleanupEntry.isIntersecting && cleanupEntry.target === entry.target) {
+                            console.log('Removing event listener for element:', entry.target)
+                            copyButton.removeEventListener('click', copyLinkHandler)
+                            cleanupObserver.disconnect()
+                        }
+                    })
+                }, { threshold: 0 })
+
+                cleanupObserver.observe(entry.target)
+            }
+        })
+    }, { threshold: 0.5 })
+
+    observer.observe(linkElement)
+}
+
+
+const loadAndDisplayLinks = () => {
+    const storedLinks = JSON.parse(localStorage.getItem("links") || "[]")
+    
+    const limitedLinks = storedLinks.slice(-3)
+
+    container.innerHTML = ''
+    limitedLinks.forEach(link => addSingleLinkToContainer(link))
+}
+
+window.addEventListener("DOMContentLoaded", loadAndDisplayLinks)
+window.addEventListener("NewDataEvent", loadAndDisplayLinks)
+</script>

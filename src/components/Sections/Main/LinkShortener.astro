@@ -1,0 +1,87 @@
+---
+import ShortLinkContainer from "./ShortLinkDisplay.astro";
+---
+
+<form method="POST" class="flex items-center gap-2 mt-4 w-full max-w-[450px]">
+    <div class="flex items-center bg-white/15 rounded-lg backdrop-blur-sm shadow-lg w-full h-10">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-3 text-white">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <input
+            type="text"
+            name="url"
+            required
+            style="outline: none; box-shadow: none; border: none;"
+            class="bg-transparent w-full text-white placeholder-gray-300 pr-3"
+            placeholder="Enter a URL"
+        />    
+    </div>
+    <button class="shrink-0 h-10 p-2 text-sm font-medium text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ">
+        Generate
+    </button>   
+</form>
+<ShortLinkContainer />
+
+<script>
+    const saveOrUpdateLink = (newLink) => {
+        let links = JSON.parse(localStorage.getItem('links') || '[]');
+        const index = links.findIndex(link => link.shortUrl === newLink.shortUrl);
+
+        if (index !== -1) {
+            links[index] = newLink; // Update the existing link
+        } else {
+            links.push(newLink); // Add the new link
+        }
+
+        localStorage.setItem('links', JSON.stringify(links));
+        window.dispatchEvent(new Event("NewDataEvent"));
+    };
+
+
+    const form = document.querySelector('form') as HTMLFormElement
+
+    window.onload = () => {
+        const inputElement = document.querySelector('input[name="url"]') as HTMLInputElement
+        inputElement.focus()
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault()
+        const formData = new FormData(form)
+        const url = formData.get('url')
+
+        try {
+            const res = await fetch('https://shorvan-backend.fly.dev/short-links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: url, shortUrl: Math.random().toString(36).substring(2, 8) })
+            });
+
+            if (!res.ok) throw new Error('Network response was not ok.');
+
+            const data = await res.json();
+            console.log('Success:', data.url, data.short_url);
+
+            saveOrUpdateLink({ url: data.url, shortUrl: data.short_url, bubbles: [{ title: 'Clicks', value: '5', color: 'rgb(0, 123, 255)', lastUpdated: new Date() }] ,addedAt: new Date()})
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
+        form.reset();
+    });
+</script>
+
+<style is:global>
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    border: 0;
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px #00000000 inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+</style>
