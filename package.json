@@ -11,8 +11,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "git checkout master && git merge develop && npm version patch -m 'Release: %s' && git push origin master && git checkout develop && git push origin develop",
-    "hotfix": "git checkout master && git merge develop && npm version patch -m 'Hotfix: %s' && git push origin master"
+    "deploy": "git checkout main && git merge develop && npm version patch -m 'Release: %s' && git push origin main && git checkout develop && git push origin develop",
+    "hotfix": "git checkout main && git merge develop && npm version patch -m 'Hotfix: %s' && git push origin main"
   },
   "dependencies": {
     "@astrojs/tailwind": "^5.1.0",
