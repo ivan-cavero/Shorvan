@@ -1,5 +1,8 @@
 {
-  "name": "frontend2",
+  "name": "shorvan",
+  "author": "Ivan Cavero",
+  "description": "Shorvan is a URL shortener that helps you shorten links. Developed by Ivan Cavero",
+  "license": "MIT",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -7,7 +10,9 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "git checkout master && git merge develop && npm version patch -m 'Release: %s' && git push origin master && git checkout develop && git push origin develop",
+    "hotfix": "git checkout master && git merge develop && npm version patch -m 'Hotfix: %s' && git push origin master"
   },
   "dependencies": {
     "@astrojs/tailwind": "^5.1.0",
