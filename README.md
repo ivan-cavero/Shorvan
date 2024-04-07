@@ -1,14 +1,14 @@
-# Astro Starter Kit: Minimal
+# Shorvan: A Fast Link Shortener 🚀
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Welcome to **Shorvan**! This is a super-fast link shortener app designed to showcase real-time functionalities using WebSockets, the power of local storage, and the simplicity and speed of Astro. Shorvan is a project I created as a learning journey, exploring technologies I've never used before. I've incorporated Astro with Vanilla JavaScript/TypeScript for the frontend, and for the backend, I've spun up a separate project utilizing Bun, Elysia, and Turso.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+- Backend Project: [Shorvan Backend](enlace)
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Features 🌟
+
+- **Link Shortening:** Quickly shorten your long URLs.
+- **Real-Time Updates:** Watch the number of shortened links update in real-time with WebSockets.
+- **Persistence:** Your shortened links are saved locally using localStorage, so they're always at hand.
 
 ## 🚀 Project Structure
 
@@ -17,7 +17,12 @@ Inside of your Astro project, you'll see the following folders and files:
 ```text
 /
 ├── public/
+│   └── favicon.svg
 ├── src/
+│   ├── components/
+│   │   └── Card.astro
+│   ├── layouts/
+│   │   └── Layout.astro
 │   └── pages/
 │       └── index.astro
 └── package.json
