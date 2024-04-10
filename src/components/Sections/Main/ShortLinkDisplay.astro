@@ -18,7 +18,7 @@
         <div class="mt-8 w-full flex flex-col items-center px-4">
           <div class="w-full max-w-md px-5 py-3 bg-white/10 rounded-lg backdrop-blur-sm shadow-lgtransform">
             <div class="absolute right-0 top-0 transform -translate-x-5 -translate-y-1/2 flex space-x-2">
-              ${bubblesHtml}
+              ${bubblesHtml.join('')}
             </div>
             <div class="flex items-center justify-between">
               <div class="flex-shrink-0 mr-4">
@@ -58,22 +58,13 @@
 
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-            console.log('Entry:', entry)
-
             if (entry.isIntersecting) {
-                console.log('Element is visible:', entry.target)
-
                 const copyButton = entry.target.querySelector('#copyButton');
                 const shortUrlLink = entry.target.querySelector('#shortUrlLink') as HTMLAnchorElement
-
-                console.log('Copy Button:', copyButton)
-                console.log('Short Url Link:', shortUrlLink)
 
                 const copyLinkHandler = () => {
                     navigator.clipboard.writeText(shortUrlLink.href)
                     .then(() => {
-                        console.log('Link copied successfully:', shortUrlLink.href)
-
                         const checkIcon = entry.target.querySelector('.check-icon')
                         const copyButtonIcon = entry.target.querySelector('.copy-icon')
 
@@ -97,7 +88,6 @@
                 const cleanupObserver = new IntersectionObserver(cleanupEntries => {
                     cleanupEntries.forEach(cleanupEntry => {
                         if (!cleanupEntry.isIntersecting && cleanupEntry.target === entry.target) {
-                            console.log('Removing event listener for element:', entry.target)
                             copyButton.removeEventListener('click', copyLinkHandler)
                             cleanupObserver.disconnect()
                         }
@@ -113,13 +103,38 @@
 }
 
 
-const loadAndDisplayLinks = () => {
+const loadAndDisplayLinks = async () => {
     const storedLinks = JSON.parse(localStorage.getItem("links") || "[]")
     
     const limitedLinks = storedLinks.slice(-3)
 
     container.innerHTML = ''
-    limitedLinks.forEach(link => addSingleLinkToContainer(link))
+
+    if (limitedLinks.length) {
+      const res = await fetch('https://shorvan-backend.fly.dev/short-links?' + new URLSearchParams({
+          shortCodes: limitedLinks.map(link => link.shortUrl).join(",")
+      }))
+
+      if (!res.ok) throw new Error('Network response was not ok.');
+
+      const serverLinks = await res.json()
+
+      const updatedLinks = limitedLinks.map(link => {
+          const serverLink = serverLinks.data.find(serverLink => serverLink.short_code === link.shortUrl)
+          if (serverLink) {
+              link.bubbles[0] = { title: 'Clicks', value: serverLink.click_count, color: 'rgb(0, 123, 255)'}
+              serverLink.expiration_date ? link.bubbles[1] = { title: 'Expires', value: serverLink.expiration_date, color: 'rgb(255, 59, 48)'} : null
+          }
+
+          console.log(serverLink);
+
+          return link
+      })
+
+      localStorage.setItem("links", JSON.stringify(updatedLinks));
+
+      updatedLinks.forEach(link => addSingleLinkToContainer(link))
+    }
 }
 
 window.addEventListener("DOMContentLoaded", loadAndDisplayLinks)

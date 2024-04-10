@@ -12,32 +12,23 @@ const { shortUrl } = Astro.params
     </div>
   </div>
   <script type="module">
-    async function updateClickCount() {
-      const shortUrl = document.getElementById('redirectMessage').getAttribute('data-shorturl')
-      fetch(`https://shorvan-backend.fly.dev/update-click/${shortUrl}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          event: 'click'
-        })
-      })
-    }
-
     async function fetchOriginalUrlAndRedirect() {
       const shortUrl = document.getElementById('redirectMessage').getAttribute('data-shorturl')
       try {
-        const response = await fetch(`https://shorvan-backend.fly.dev/short-link/${shortUrl}`)
+        const response = await fetch(`https://shorvan-backend.fly.dev/short-link/${shortUrl}`, {
+          method: 'GET',
+          headers: {
+            'x-security-token': 'secret',
+          },
+        })
         if (!response.ok) throw new Error('Not found')
         const data = await response.json()
-        window.location.href = data.url
+        window.location.href = data.original_url
       } catch (error) {
         document.getElementById('redirectMessage').innerHTML = `<p class="text-xl font-semibold text-red-500">URL not found.</p>`
       }
     }
 
-    updateClickCount()
     fetchOriginalUrlAndRedirect()
   </script>
 </Layout>

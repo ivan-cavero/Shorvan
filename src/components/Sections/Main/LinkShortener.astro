@@ -63,9 +63,8 @@ import ShortLinkContainer from "./ShortLinkDisplay.astro";
             if (!res.ok) throw new Error('Network response was not ok.');
 
             const data = await res.json();
-            console.log('Success:', data.url, data.short_url);
 
-            saveOrUpdateLink({ url: data.url, shortUrl: data.short_url, bubbles: [{ title: 'Clicks', value: '5', color: 'rgb(0, 123, 255)', lastUpdated: new Date() }] ,addedAt: new Date()})
+            saveOrUpdateLink({ url: data.original_url, shortUrl: data.short_code, bubbles: [] ,addedAt: new Date()});
 
         } catch (error) {
             console.error('Error:', error);
