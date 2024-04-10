@@ -52,7 +52,7 @@ import ShortLinkContainer from "./ShortLinkDisplay.astro";
         const url = formData.get('url')
 
         try {
-            const res = await fetch('http://localhost:3000/short-links', {
+            const res = await fetch('https://shorvan-backend.fly.dev/short-links', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -70,7 +70,7 @@
 
     // Connect to the WebSocket and setup event handlers
     const connectWebSocket = () => {
-        ws = new WebSocket('ws://localhost:3000/short-links/ws-count');
+        ws = new WebSocket('wss://shorvan-backend.fly.dev/short-links/ws-count');
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
