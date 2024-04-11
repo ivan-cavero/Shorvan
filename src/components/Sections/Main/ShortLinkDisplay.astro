@@ -102,6 +102,26 @@
     observer.observe(linkElement)
 }
 
+const calculateRemainingTime = (expirationDate) => {
+  const now = new Date()
+  const expiration = new Date(expirationDate)
+  const diff = new Date(expiration).getTime() - now.getTime()
+
+  if (diff < 0) return 'Expired'
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
+  if (days > 0) {
+    return `${days}d`
+  } else if (hours > 0) {
+    return `${hours}h`
+  } else {
+    return `${minutes}m`
+  }
+}
+
 
 const loadAndDisplayLinks = async () => {
     const storedLinks = JSON.parse(localStorage.getItem("links") || "[]")
@@ -123,7 +143,10 @@ const loadAndDisplayLinks = async () => {
           const serverLink = serverLinks.data.find(serverLink => serverLink.short_code === link.shortCode)
           if (serverLink) {
               link.bubbles[0] = { title: 'Clicks', value: serverLink.click_count, color: 'rgb(0, 123, 255)'}
-              serverLink.expiration_date ? link.bubbles[1] = { title: 'Expires', value: serverLink.expiration_date, color: 'rgb(255, 59, 48)'} : null
+                if (serverLink.expiration_date) {
+                  const remainingTime = calculateRemainingTime(serverLink.expiration_date)
+                  link.bubbles[1] = { title: 'Expires in', value: remainingTime, color: 'rgb(80, 80, 80)'}
+                }
           }
 
           return link
