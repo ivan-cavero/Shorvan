@@ -57,7 +57,11 @@ import ShortLinkContainer from "./ShortLinkDisplay.astro";
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ url: url, shortCode: Math.random().toString(36).substring(2, 8) })
+                body: JSON.stringify({
+                    url: url,
+                    shortCode: Math.random().toString(36).substring(2, 8), // Generate a random short code
+                    expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1) // 1 days
+                })
             });
 
             if (!res.ok) throw new Error('Network response was not ok.');
