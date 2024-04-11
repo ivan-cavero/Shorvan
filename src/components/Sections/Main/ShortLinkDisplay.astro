@@ -111,7 +111,7 @@ const loadAndDisplayLinks = async () => {
     container.innerHTML = ''
 
     if (limitedLinks.length) {
-      const res = await fetch('https://shorvan-backend.fly.dev/short-links?' + new URLSearchParams({
+      const res = await fetch(`${import.meta.env.PUBLIC_BASE_URL}/short-links?` + new URLSearchParams({
           shortCodes: limitedLinks.map(link => link.shortUrl).join(",")
       }))
 
