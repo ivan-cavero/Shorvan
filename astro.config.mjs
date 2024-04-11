@@ -8,5 +8,12 @@ export default defineConfig({
   integrations: [tailwind()],
   output: "hybrid",
   prefetch: true,
-  adapter: vercel()
+  adapter: vercel(),
+  experimental: {
+    security: {
+      csrfProtection: {
+        origin: true
+      }
+    }
+  }
 })
