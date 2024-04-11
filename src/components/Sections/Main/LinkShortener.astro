@@ -76,7 +76,7 @@ import ShortLinkContainer from "./ShortLinkDisplay.astro";
             })
             .then(async res => {
                 const data = await res.json();
-                saveOrUpdateLink({ url: data.original_url, shortCode: data.short_code, bubbles: [] ,addedAt: new Date()});
+                saveOrUpdateLink({ url: data.original_url, shortCode: data.short_code, expirationDate: data?.expirationDate, bubbles: [] ,addedAt: new Date()});
             })
             .catch(error => {
                 console.error('Error:', error);

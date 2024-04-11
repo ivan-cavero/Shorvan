@@ -123,38 +123,43 @@ const calculateRemainingTime = (expirationDate) => {
 }
 
 const loadAndDisplayLinks = async () => {
-    const storedLinks = JSON.parse(localStorage.getItem("links") || "[]")
-    
-    const limitedLinks = storedLinks.slice(-3)
+  const storedLinks = JSON.parse(localStorage.getItem("links") || "[]")
+  
+  const limitedLinks = storedLinks.slice(-3)
 
-    container.innerHTML = ''
+  container.innerHTML = ''
 
-    if (limitedLinks.length) {
-      const res = await fetch(`${import.meta.env.PUBLIC_BASE_URL}/short-links?` + new URLSearchParams({
-          shortCodes: limitedLinks.map(link => link.shortCode).join(",")
-      }))
+  if (limitedLinks.length) {
+    const res = await fetch(`${import.meta.env.PUBLIC_BASE_URL}/short-links?` + new URLSearchParams({
+      shortCodes: limitedLinks.map(link => link.shortCode).join(",")
+    }))
 
-      if (!res.ok) throw new Error('Network response was not ok.');
+    if (!res.ok) throw new Error('Network response was not ok.');
 
-      const serverLinks = await res.json()
+    const serverLinks = await res.json()
 
-      const updatedLinks = limitedLinks.map(link => {
-          const serverLink = serverLinks.data.find(serverLink => serverLink.short_code === link.shortCode)
-          if (serverLink) {
-              link.bubbles[0] = { title: 'Clicks', value: serverLink.click_count, color: 'rgb(0, 123, 255)'}
-                if (serverLink.expiration_date) {
-                  const remainingTime = calculateRemainingTime(serverLink.expiration_date)
-                  link.bubbles[1] = { title: 'Expires in', value: remainingTime, color: 'rgb(80, 80, 80)'}
-                }
-          }
+    const updatedLinks = limitedLinks.map(link => {
+      const serverLink = serverLinks.data.find(serverLink => serverLink.short_code === link.shortCode)
+      if (serverLink) {
+        link.bubbles[0] = { title: 'Clicks', value: serverLink.click_count, color: 'rgb(0, 123, 255)'}
+        if (serverLink.expiration_date) {
+          const remainingTime = calculateRemainingTime(serverLink.expiration_date)
+          link.bubbles[1] = { title: 'Expires in', value: remainingTime, color: 'rgb(80, 80, 80)'}
+        }
+      }
 
-          return link
-      })
+      return link
+    }).filter(link => {
+      if (link.bubbles[1] && link.bubbles[1].title === 'Expires in' && link.bubbles[1].value === 'Expired') {
+        return false
+      }
+      return true
+    })
 
-      localStorage.setItem("links", JSON.stringify(updatedLinks));
+    localStorage.setItem("links", JSON.stringify(updatedLinks));
 
-      updatedLinks.forEach(link => addSingleLinkToContainer(link))
-    }
+    updatedLinks.forEach(link => addSingleLinkToContainer(link))
+  }
 }
 
 window.addEventListener("DOMContentLoaded", loadAndDisplayLinks)
