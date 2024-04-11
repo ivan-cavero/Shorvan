@@ -26,7 +26,7 @@ import ShortLinkContainer from "./ShortLinkDisplay.astro";
 <script>
     const saveOrUpdateLink = (newLink) => {
         let links = JSON.parse(localStorage.getItem('links') || '[]');
-        const index = links.findIndex(link => link.shortUrl === newLink.shortUrl);
+        const index = links.findIndex(link => link.shortCode === newLink.shortCode);
 
         if (index !== -1) {
             links[index] = newLink; // Update the existing link
@@ -57,14 +57,14 @@ import ShortLinkContainer from "./ShortLinkDisplay.astro";
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ url: url, shortUrl: Math.random().toString(36).substring(2, 8) })
+                body: JSON.stringify({ url: url, shortCode: Math.random().toString(36).substring(2, 8) })
             });
 
             if (!res.ok) throw new Error('Network response was not ok.');
 
             const data = await res.json();
 
-            saveOrUpdateLink({ url: data.original_url, shortUrl: data.short_code, bubbles: [] ,addedAt: new Date()});
+            saveOrUpdateLink({ url: data.original_url, shortCode: data.short_code, bubbles: [] ,addedAt: new Date()});
 
         } catch (error) {
             console.error('Error:', error);

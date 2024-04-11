@@ -26,7 +26,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center">
-                  <a id="shortUrlLink" href="${window.location.origin}/${link.shortUrl}" class="text-lg text-blue-400 break-all truncate">${link.shortUrl}</a>
+                  <a id="shortUrlLink" href="${window.location.origin}/${link.shortCode}" class="text-lg text-blue-400 break-all truncate">${link.shortCode}</a>
                 </div>
                 <p class="mt-2 text-xs text-gray-400 truncate">${link.url}</p>
               </div>
@@ -112,7 +112,7 @@ const loadAndDisplayLinks = async () => {
 
     if (limitedLinks.length) {
       const res = await fetch(`${import.meta.env.PUBLIC_BASE_URL}/short-links?` + new URLSearchParams({
-          shortCodes: limitedLinks.map(link => link.shortUrl).join(",")
+          shortCodes: limitedLinks.map(link => link.shortCode).join(",")
       }))
 
       if (!res.ok) throw new Error('Network response was not ok.');
@@ -120,13 +120,11 @@ const loadAndDisplayLinks = async () => {
       const serverLinks = await res.json()
 
       const updatedLinks = limitedLinks.map(link => {
-          const serverLink = serverLinks.data.find(serverLink => serverLink.short_code === link.shortUrl)
+          const serverLink = serverLinks.data.find(serverLink => serverLink.short_code === link.shortCode)
           if (serverLink) {
               link.bubbles[0] = { title: 'Clicks', value: serverLink.click_count, color: 'rgb(0, 123, 255)'}
               serverLink.expiration_date ? link.bubbles[1] = { title: 'Expires', value: serverLink.expiration_date, color: 'rgb(255, 59, 48)'} : null
           }
-
-          console.log(serverLink);
 
           return link
       })
