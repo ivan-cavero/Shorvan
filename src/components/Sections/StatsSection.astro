@@ -2,25 +2,25 @@
 const stats = [
     {
         title: 'Short Links',
-        id: 'short-links',
-        value: '6'
+        id: 'links',
+        value: '...'
     },
     {
         title: 'Clicks',
         id: 'clicks',
-        value: '196'
+        value: '...'
     },
     {
         title: 'Users',
         id: 'users',
-        value: '1'
+        value: '...'
     }
 ]
 ---
 
-<div class="bg-[rgb(27,36,48)] border-gray-600 border-t-2">
+<section class="bg-[rgb(27,36,48)] border-gray-600 border-t-2">
     <div class="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-10">
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3" data-stats={JSON.stringify(stats)} id="stats">
             {stats.map((stat, index) => (
                 <div class={`text-center${index === stats.length - 1 ? '' : ' md:border-r border-slate-600'}`} id={`${stat.id}`}>
                     <h6 class="text-4xl font-bold lg:text-5xl xl:text-6xl from-[#9467ff] to-[#2a77a7] bg-gradient-to-r bg-clip-text text-transparent">{stat.value}</h6>
@@ -31,4 +31,39 @@ const stats = [
             ))}
         </div>
     </div>
-</div>
+</section>
+
+<script>
+    let isFirstTime = true;
+    const stats = JSON.parse(document.getElementById("stats").dataset.stats)
+
+    new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting && isFirstTime) {
+                fetch(`${import.meta.env.PUBLIC_BASE_URL}/short-links/count`)
+                    .then(async (response) => {
+                        const reader = response.body.getReader()
+                        let result = await reader.read()
+
+                        while (!result.done) {
+                            const message = new TextDecoder().decode(result.value)
+                            const dataValue = message.match(/data: (.*)/)[1]
+
+                            stats.forEach((stat) => {
+                                if (dataValue.includes(stat.id)) {
+                                    document.getElementById(stat.id).querySelector("h6").textContent = String(Object.values(JSON.parse(dataValue))[0])
+                                }
+                            })
+
+                            result = await reader.read()
+                        }
+
+                        isFirstTime = false
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                    })
+            }
+        })
+    }, { threshold: 0.5 }).observe(document.querySelector("section"))
+</script>
