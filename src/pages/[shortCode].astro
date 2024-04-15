@@ -15,12 +15,14 @@ const { shortCode } = Astro.params
     async function fetchOriginalUrlAndRedirect() {
       const shortCode = document.getElementById('redirectMessage').getAttribute('data-shortcode')
       try {
-        const response = await fetch(`${import.meta.env.PUBLIC_BASE_URL}/short-link/${shortCode}`, {
+        const response = await fetch(`https://shorvan-backend.fly.dev/short-link/${shortCode}`, {
           method: 'GET',
           headers: {
             'x-security-token': 'secret',
           },
         })
+
+        console.log(response);
         if (!response.ok) throw new Error('Not found')
         const data = await response.json()
         window.location.href = data.original_url
