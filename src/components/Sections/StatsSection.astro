@@ -1,0 +1,31 @@
+---
+const stats = [
+    {
+        title: 'Short Links',
+        value: '12.9K'
+    },
+    {
+        title: 'Clicks',
+        value: '12.9K'
+    },
+    {
+        title: 'Users',
+        value: '12.9K'
+    }
+]
+---
+
+<div class=" bg-gray-800 border-gray-600 border-t-2">
+    <div class="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {stats.map((stat, index) => (
+                <div class={`text-center ${index === stats.length - 1 ? '' : 'md:border-r'}`}>
+                    <h6 class="text-4xl font-bold lg:text-5xl xl:text-6xl from-[#9467ff] to-[#2a77a7] bg-gradient-to-r bg-clip-text text-transparent">{stat.value}</h6>
+                    <p class="text-sm font-medium tracking-widest text-white uppercase lg:text-base">
+                        {stat.title}
+                    </p>
+                </div>
+            ))}
+        </div>
+    </div>
+</div>
