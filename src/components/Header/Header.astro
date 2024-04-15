@@ -37,7 +37,7 @@ const menuItems = [
 ]
 ---
 
-<header class="fixed top-0 left-0 w-full bg-gray-800 lg:bg-transparent transition-bg z-10">
+<header class="fixed top-0 left-0 w-full bg-gray-800 lg:bg-white/5 lg:backdrop-blur-sm lg:shadow-lg transition-bg z-10">
     <nav class="flex items-center justify-between max-w-7xl mx-auto p-4 lg:px-8 text-white">
         <!-- Logo -->
       <a class="flex items-center">
@@ -146,27 +146,4 @@ const menuItems = [
   }
 
   mobileMenuButton.addEventListener('click', toggleMobileMenu)
-  
-
-  // Make header solid on scroll clases
-  const setHeaderStyle = (add) => {
-      const header = document.querySelector('header')
-      if (add) {
-          header.classList.add('bg-gray-800', 'shadow')
-          header.classList.remove('bg-transparent')
-      } else {
-          header.classList.remove('bg-gray-800', 'shadow')
-          header.classList.add('bg-transparent')
-      }
-  }
-
-  const checkScreenAndSetHeaderStyle = () => {
-      if (window.innerWidth >= 1024) {
-          setHeaderStyle(window.scrollY > 10)
-      } else {
-          setHeaderStyle(true)
-      }
-  }
-
-  window.addEventListener('scroll', checkScreenAndSetHeaderStyle)
 </script>
