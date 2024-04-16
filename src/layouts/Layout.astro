@@ -1,4 +1,6 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
+
 interface Props {
 	title: string;
 	description: string;
@@ -17,6 +19,7 @@ const { title, description } = Astro.props;
 		<meta property="og:description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<title>{title}</title>
+		<ViewTransitions />
 		{import.meta.env.MODE === 'production' && <script defer src="https://eu.umami.is/script.js" data-website-id="e6c6496f-8735-4583-a5c3-890314f44d3d" />}
 	</head>
 	<body>
