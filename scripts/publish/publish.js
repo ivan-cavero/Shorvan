@@ -27,7 +27,7 @@ fetchOlderVersions()
 await changeVersion()
 await generatingPublishNote()
 preRelease()
-//checkout()
+checkout()
 
 function fetchOlderVersions() {
     log.info('Fetching older versions...')
@@ -99,6 +99,12 @@ async function changeVersion () {
             versionNumberValid = true
             nextVersion = version
 
+            log.debug(`Executing: git checkout -b publish-${nextVersion}`)
+            execSync(`git checkout -b publish-${nextVersion}`)
+    
+            log.debug('Executing: git merge develop')
+            execSync('git merge develop')    
+
             packageJson.version = version
             writeFileSync('./package.json', JSON.stringify(packageJson, null, 2))
 
@@ -139,12 +145,6 @@ function preRelease() {
 function checkout() {
     try {
         log.info('Checkout and push a new branch for publishing...')
-
-        log.debug(`Executing: git checkout -b publish-${nextVersion}`)
-        execSync(`git checkout -b publish-${nextVersion}`)
-
-        log.debug('Executing: git merge develop')
-        execSync('git merge develop')    
 
         log.debug('Adding changes to Git index...')
         execSync('git add .')
