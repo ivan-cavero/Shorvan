@@ -1,5 +1,5 @@
 import { execSync, spawnSync } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, readFileSync } from 'node:fs'
 import readline from 'node:readline'
 
 const rl =  readline.createInterface(process.stdin, process.stdout)
@@ -42,6 +42,7 @@ function fetchOlderVersions() {
         : gitCommands.map(cmd => `${cmd} ${isWindows ? '> NUL 2>&1 || exit 0' : '> /dev/null 2>&1 || exit 0'}`)
 
     try {
+        // biome-ignore lint/complexity/noForEach: <explanation>
         commandsToExecute.forEach(cmd => execSync(cmd))
         log.success('Older versions fetched!')
     } catch (error) {
@@ -117,7 +118,66 @@ async function changeVersion () {
 
 async function generatingPublishNote() {
     log.info('Generating changelog...')
-    execSync('bun run changelog')
+    
+    const packageJson = require('../../package.json')
+    const currentVersion = packageJson.version
+
+    // Ask for the starting tag
+    const startingTag = await new Promise(resolve => {
+        rl.question(`Starting tag (default: ${currentVersion}): `, input => {
+            resolve(input.trim() || currentVersion)
+        })
+    })
+
+    const newVersion = `v${nextVersion}`
+    
+    spawnSync('git', ['tag', '-a', `${newVersion}`, '-m', `Version ${newVersion}`])
+
+    const logOutput = spawnSync('git', ['log', `${startingTag}..${newVersion}`, '--pretty=format:%H %s']).stdout.toString()
+
+    const commits = logOutput.trim().split('\n').map(line => {
+        const [hash, ...messageParts] = line.split(' ')
+        const message = messageParts.join(' ')
+        return { hash, message }
+    })
+    
+    const categorizedCommits = {
+        Features: [],
+        Fixes: [],
+        Docs: [],
+        Others: []
+    }
+
+    // biome-ignore lint/complexity/noForEach: <explanation>
+    commits.forEach(commit => {
+        if (commit.message.startsWith('feat')) {
+            categorizedCommits.Features.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message.replace('feat:', '').trim()}`)
+        } else if (commit.message.startsWith('fix')) {
+            categorizedCommits.Fixes.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message.replace('fix:', '').trim()}`)
+        } else if (commit.message.startsWith('docs')) {
+            categorizedCommits.Docs.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message.replace('docs:', '').trim()}`)
+        } else {
+            categorizedCommits.Others.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message}`)
+        }
+    })
+
+    const formattedCommits = Object.entries(categorizedCommits).map(([category, commits]) => {
+        if (commits.length === 0) return ''
+        return `##### ${category}\n${commits.join('\n')}`
+    }).filter(Boolean).join('\n')
+
+    const originalChangelog = readFileSync('./CHANGELOG.md', 'utf-8')
+
+    const changelogContent = `
+#### ${nextVersion} (${new Date().toISOString().split('T')[0]})
+
+${formattedCommits}
+
+${originalChangelog.trim()}
+    `
+
+    writeFileSync('./CHANGELOG.md', changelogContent)
+    
     log.success('Changelog generated!')
 
     while (true) {
