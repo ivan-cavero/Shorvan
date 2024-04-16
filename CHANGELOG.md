@@ -1,5 +1,11 @@
 # shorvan
 
+## 0.0.10
+
+### Patch Changes
+
+- [880e48875eb4ba7b4cc95cf704ff54a33a557257](https://github.com/ivan-cavero/Shorvan/commit/880e48875eb4ba7b4cc95cf704ff54a33a557257) - Update [slug].astro file with layout changes
+
 ## 0.0.9
 
 ### Patch Changes
@@ -10,4 +16,4 @@
 - [d3615bc3eb6d91c1143c073b0f6f69d69547d036](https://github.com/ivan-cavero/Shorvan/commit/d3615bc3eb6d91c1143c073b0f6f69d69547d036) - Update BlogCard component and related pages
 - [5fc286fb3da7726c3ce0497d214df7f4e1f98ece](https://github.com/ivan-cavero/Shorvan/commit/5fc286fb3da7726c3ce0497d214df7f4e1f98ece) - Merge branch 'develop'
 - [c0dd7723f57fcb1d295b78582200655bf892717e](https://github.com/ivan-cavero/Shorvan/commit/c0dd7723f57fcb1d295b78582200655bf892717e) - Add deploy.js to .gitignore
-
+
