@@ -1,6 +1,7 @@
 import { execSync, spawnSync } from 'node:child_process'
-import { writeFileSync, readFileSync } from 'node:fs'
+import { writeFileSync, readFileSync, readdirSync } from 'node:fs'
 import readline from 'node:readline'
+import { join } from 'node:path'
 
 const rl =  readline.createInterface(process.stdin, process.stdout)
 
@@ -192,6 +193,28 @@ ${originalChangelog.trim()}
             break
         }
     }
+
+    // Create release file
+    const postNumber = readdirSync('../../src/pages/blog/post').length + 1
+    const postFilename = `${String(postNumber).padStart(3, '0')}.md`
+    const postPath = join('../../src/pages/blog/post', postFilename)
+
+        const postContent = `---
+    title: Release ${version}
+    date: ${new Date().toISOString()}
+    author: Ivan Cavero
+    description: Release ${version} of Shorvan
+    slug: shorvan-${postNumber}
+    ---
+
+    ## ${version}
+
+    ### Patch Changes
+
+    ${commitMessages}
+    `
+
+        fs.writeFileSync(postPath, postContent)
 
     log.success('Change log finished!');
 }
