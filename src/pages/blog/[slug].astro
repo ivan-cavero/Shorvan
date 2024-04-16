@@ -1,26 +1,64 @@
 ---
-import Layout from '../../layouts/Layout.astro'
+import Layout from '@layouts/Layout.astro';
+import Header from '@components/Header/Header.astro';
+import Footer from '@components/Footer/Footer.astro';
 
 export async function getStaticPaths() {
-  const posts = await Astro.glob('@pages/blog/post/*.md')
+	const posts = await Astro.glob('@pages/blog/post/*.md')
 
-  return posts.map(post => ({
-    params: {
-      slug: post.frontmatter.slug
-    },
-    props: {
-      post
-    },
-  }))
+	return posts.map(post => ({
+		params: {
+			slug: post.frontmatter.slug
+		},
+		props: {
+			post
+		}
+	}))
 }
 
 const { Content } = Astro.props.post
-
+const { title, date } = Astro.props.post.frontmatter
 ---
-
-<Layout title="Shorvan | Redirect to original URL" description="Redirect to original URL from Shorvan">
-  <div class="flex h-screen bg-gray-900 text-white justify-center items-center">
-    <Content />
-  </div>
-  </div>
+<Layout title="Shorvan | Changlog" description="Changelog for Shorvan">
+  <Header />
+  <main class="mx-auto w-full px-4 lg:px-0 bg-gray-800">
+      <div class="mx-auto w-full max-w-screen-lg md:-mb-10 lg:-mb-12 xl:-mb-16 pt-20">
+          <img
+              src="https://placehold.co/1500x640"
+              width="1500"
+              height="640"
+              loading="lazy"
+              decoding="async"
+              alt=""
+              class="min-h-[240px] w-full object-cover"
+          />
+      </div>
+      <div class="grid-container relative mx-auto max-w-screen-lg">
+          <div
+              class="mx-auto w-fit max-w-full bg-gray-900 text-white py-8 md:px-10 md:py-12 lg:p-12 lg:py-16 xl:p-16 xl:py-20"
+          >
+              <header class="mx-auto w-full max-w-prose text-center">
+                  <time
+                      class="text-astro-gray-200"
+                      datetime="2024-04-11T00:00:00.000Z"
+                  >
+                      { date }
+                  </time>
+                  <h1 class="heading-3 mb-4 mt-2 md:heading-2 sm:mb-5 sm:mt-3">
+                      { title }
+                  </h1>
+              </header>
+              <hr class="-mx-16 my-8 border-astro-gray-500 lg:my-16" />
+              <article>
+                  <p>
+                    <strong>
+                      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Molestias aliquid incidunt vero sit esse quod ut nam eum dolorum facere laborum minus ipsum autem dicta sapiente, iusto similique non porro!
+                    </strong>
+                    <Content />
+                  </p>
+              </article>
+          </div>
+      </div>
+  </main>
+  <Footer />
 </Layout>
