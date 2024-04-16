@@ -24,10 +24,10 @@ log.info('Starting publishing process...')
 let nextVersion
 
 fetchOlderVersions()
-changeVersion()
-generatingPublishNote()
+await changeVersion()
+await generatingPublishNote()
 preRelease()
-checkout()
+//checkout()
 
 function fetchOlderVersions() {
     log.info('Fetching older versions...')
@@ -51,7 +51,7 @@ function fetchOlderVersions() {
     }
 }
 
-async function changeVersion() {
+async function changeVersion () {
     log.info('Updating version number...')
   
     const packageJson = require('../../package.json')
@@ -96,11 +96,6 @@ async function changeVersion() {
         })
 
         if (checkVersionNumber(currentVersion, version)) {
-            rl.close()
-
-            if (version === versionDefault) {
-                log.warn(`You are using the default version number ${versionDefault}.`)
-            }
             versionNumberValid = true
             nextVersion = version
 
@@ -142,25 +137,28 @@ function preRelease() {
 }
 
 function checkout() {
-    log.info('Checkout and push a new branch for publishing...')
-
-    const gitCommands = [
-        `git checkout -b publish-${nextVersion}`,
-        'git add .',
-        `git commit -m "Release (${nextVersion}): package.json and CHANGELOG.md"`,
-        'git merge develop',
-        `git push origin publish-${nextVersion}`
-    ]
-
-    const commandsToExecute = isDebug
-        ? gitCommands
-        : gitCommands.map(cmd => `${cmd} ${isWindows ? '> NUL 2>&1 || exit 0' : '> /dev/null 2>&1 || exit 0'}`)
-
     try {
-        commandsToExecute.forEach(cmd => execSync(cmd))
+        log.info('Checkout and push a new branch for publishing...')
+
+        log.debug(`Executing: git checkout -b publish-${nextVersion}`)
+        execSync(`git checkout -b publish-${nextVersion}`)
+
+        log.debug('Executing: git merge develop')
+        execSync('git merge develop')    
+
+        log.debug('Adding changes to Git index...')
+        execSync('git add .')
+        
+        const commitMessage = `Release (${nextVersion}): package.json and CHANGELOG.md`
+        log.debug(`Executing: git commit -m "${commitMessage}"`)
+        spawnSync('git', ['commit', '-m', commitMessage])
+
+        log.debug(`Executing: git push origin publish-${nextVersion}`)
+        execSync(`git push origin publish-${nextVersion}`)
+        
         log.success('Please go to GitHub and make a pull request.')
     } catch (error) {
-        log.error('Git command failed.')
+        log.error('Error occurred during the process.')
         if (isDebug) throw error
         process.exit(1)
     }
