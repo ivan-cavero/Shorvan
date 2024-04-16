@@ -31,8 +31,8 @@ const menuItems = [
 		url: "#"
 	},
 	{
-		name: "Changelog",
-		url: "#"
+		name: "Blog",
+		url: "/blog"
 	}
 ]
 ---
@@ -59,7 +59,7 @@ const menuItems = [
         {menuItems.map((item) => (
             <li class="relative group">
                 <div class="flex items-center gap-x-1 text-sm font-semibold leading-6 cursor-pointer">
-                    {item.name}
+                    <a href={item.url}>{item.name}</a>
                     {item.subItems && (
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path d="M19 9l-7 7-7-7" />
