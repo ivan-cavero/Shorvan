@@ -150,11 +150,11 @@ async function generatingPublishNote() {
 
     // biome-ignore lint/complexity/noForEach: <explanation>
     commits.forEach(commit => {
-        if (commit.message.startsWith('feat')) {
+        if (commit.message.toLowerCase().startsWith('feat')) {
             categorizedCommits.Features.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message.replace('feat:', '').trim()}`)
-        } else if (commit.message.startsWith('fix')) {
+        } else if (commit.message.toLowerCase().startsWith('fix')) {
             categorizedCommits.Fixes.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message.replace('fix:', '').trim()}`)
-        } else if (commit.message.startsWith('docs')) {
+        } else if (commit.message.toLowerCase().startsWith('docs')) {
             categorizedCommits.Docs.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message.replace('docs:', '').trim()}`)
         } else {
             categorizedCommits.Others.push(`* [${commit.hash}](https://github.com/ivan-cavero/Shorvan/commit/${commit.hash}) - ${commit.message}`)
@@ -215,6 +215,9 @@ function checkout() {
 
         log.debug(`Executing: git push origin publish-${nextVersion}`)
         execSync(`git push origin publish-${nextVersion}`)
+
+        log.debug(`Executing: git push origin tag v${nextVersion}`)
+        spawnSync('git', ['push', 'origin', '--tags'])
         
         log.success('Please go to GitHub and make a pull request.')
     } catch (error) {
