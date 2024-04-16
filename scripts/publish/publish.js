@@ -124,8 +124,8 @@ async function generatingPublishNote() {
 
     // Ask for the starting tag
     const startingTag = await new Promise(resolve => {
-        rl.question(`Starting tag (default: ${currentVersion}): `, input => {
-            resolve(input.trim() || currentVersion)
+        rl.question(`Starting tag (default: v${currentVersion}): `, input => {
+            resolve(input.trim() || `v${currentVersion}`)
         })
     })
 
