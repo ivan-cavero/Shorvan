@@ -128,9 +128,8 @@ jobs:
       env:
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         PAGE_ID: ${{ steps.check_notion_task.outputs.page_id }}
+        ALL_COMMITS: ${{ steps.get_existing_commits.outputs.all_commits }}
       run: |
-        ALL_COMMITS="${{ steps.Get Existing GitHub Commits from Notion.outputs.all_commits }}"
-        
         JSON='{
           "properties": {
             "GitHub Commit": {
