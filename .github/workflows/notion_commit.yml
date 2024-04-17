@@ -68,8 +68,8 @@ jobs:
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         DATABASE_ID: "${{ secrets.NOTION_DB }}"
         COMMIT_ID: ${{ steps.commit_id.outputs.commit_id }}
-        TASK_NAME: $(git log -1 --pretty=format:'%s')
       run: |
+        TASK_NAME=$(git log -1 --pretty=format:'%s')
         JSON='{
           "parent": {
             "database_id": "'$DATABASE_ID'"
