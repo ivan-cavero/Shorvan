@@ -21,5 +21,95 @@ jobs:
       id: extract_task_id
       run: |
         COMMIT_MSG=$(git log -1 --pretty=format:'%s')
-        TASK_ID=$(echo $COMMIT_MSG | grep -o 'SHO-[0-9]*' | head -n 1)
-        echo "::set-output name=task_id::${TASK_ID##SHO-}"
+        if [[ $COMMIT_MSG =~ SHO-([0-9]+) ]]; then
+          TASK_ID=${BASH_REMATCH[1]}
+        else
+          TASK_ID=""
+        fi
+        echo "::set-output name=task_id::${TASK_ID}"
+
+    - name: Check if Task exists in Notion
+      id: check_notion_task
+      env:
+        NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        DATABASE_ID: "${{ secrets.NOTION_DB }}"
+        TASK_ID: ${{ steps.extract_task_id.outputs.task_id }}
+      run: |
+        if [ -z "$TASK_ID" ]; then
+          echo "::set-output name=task_exists::false"
+        else
+          response=$(curl -s -X POST "https://api.notion.com/v1/databases/$DATABASE_ID/query" \
+            -H "Authorization: Bearer $NOTION_API_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Notion-Version: 2022-06-28")
+          if echo "$response" | grep -q "$TASK_ID"; then
+            echo "::set-output name=task_exists::true"
+          else
+            echo "::set-output name=task_exists::false"
+          fi
+        fi
+
+    - name: Update or Create Task in Notion
+      if: steps.check_notion_task.outputs.task_exists == 'false'
+      env:
+        NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        DATABASE_ID: "${{ secrets.NOTION_DB }}"
+        COMMIT_ID: ${{ steps.commit_id.outputs.commit_id }}
+        TASK_NAME: $(git log -1 --pretty=format:'%s')
+      run: |
+        JSON='{
+          "parent": {
+            "database_id": "'$DATABASE_ID'"
+          },
+          "properties": {
+            "Task name": {
+              "title": [
+                {
+                  "text": {
+                    "content": "'"$TASK_NAME"'"
+                  }
+                }
+              ]
+            },
+            "GitHub Commit": {
+              "rich_text": [
+                {
+                  "text": {
+                    "content": "'"$COMMIT_ID"'"
+                  }
+                }
+              ]
+            }
+          }
+        }'
+        curl -X POST "https://api.notion.com/v1/pages" \
+          -H "Authorization: Bearer $NOTION_API_KEY" \
+          -H "Content-Type: application/json" \
+          -H "Notion-Version: 2022-06-28" \
+          --data "$JSON"
+
+    - name: Update Existing Task in Notion
+      if: steps.check_notion_task.outputs.task_exists == 'true'
+      env:
+        NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        TASK_ID: ${{ steps.extract_task_id.outputs.task_id }}
+        COMMIT_ID: ${{ steps.commit_id.outputs.commit_id }}
+      run: |
+        JSON='{
+          "properties": {
+            "GitHub Commit": {
+              "rich_text": [
+                {
+                  "text": {
+                    "content": "'"$COMMIT_ID"'"
+                  }
+                }
+              ]
+            }
+          }
+        }'
+        curl -X PATCH "https://api.notion.com/v1/pages/$TASK_ID" \
+          -H "Authorization: Bearer $NOTION_API_KEY" \
+          -H "Content-Type: application/json" \
+          -H "Notion-Version: 2022-06-28" \
+          --data "$JSON"
