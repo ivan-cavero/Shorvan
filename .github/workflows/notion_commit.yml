@@ -1,4 +1,4 @@
-name: Update Notion with GitHub Commit
+name: Notion Commit
 
 on:
   push:
@@ -6,13 +6,12 @@ on:
       - develop
 
 jobs:
-  update-notion:
+  build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+      
     - name: Get GitHub Commit ID
       id: commit_id
       run: echo "::set-output name=commit_id::$(git log -1 --pretty=format:'%H')"
