@@ -1,0 +1,29 @@
+name: Notion Commit
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Extract task identifier
+      id: extract_task
+      run: echo "::set-output name=task_id::$(git log -1 --pretty=format:'%s' | grep -o 'SHO-[0-9]*')"
+
+    - name: Register commit in Notion
+      env:
+        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        NOTION_DATABASE_ID: ${{ secrets.NOTION_DB }}
+      run: |
+        task_id="${{ steps.extract_task.outputs.task_id }}"
+        json="{\"parent\": {\"database_id\": \"$NOTION_DATABASE_ID\"}, \"properties\": {\"title\": {\"title\": [{\"text\": {\"content\": \"$task_id\"}}]}}}"
+        curl -X POST https://api.notion.com/v1/pages \
+          -H "Authorization: Bearer $NOTION_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$json"
