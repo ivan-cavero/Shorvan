@@ -101,34 +101,12 @@ jobs:
           -H "Notion-Version: 2022-06-28" \
           --data "$JSON"
 
-    - name: Get Existing GitHub Commits from Notion
+    - name: Update Existing Task in Notion
       if: steps.check_notion_task.outputs.task_exists == 'true'
       env:
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         PAGE_ID: ${{ steps.check_notion_task.outputs.page_id }}
-      run: |
-        response=$(curl -s -X GET "https://api.notion.com/v1/pages/$PAGE_ID" \
-          -H "Authorization: Bearer $NOTION_TOKEN" \
-          -H "Content-Type: application/json" \
-          -H "Notion-Version: 2022-06-28")
-        
-        EXISTING_COMMITS=$(echo "$response" | jq -r '.properties."GitHub Commit".rich_text[0].text.content')
-        NEW_COMMIT="${{ steps.commit_id.outputs.commit_id }}"
-        
-        if [ -z "$EXISTING_COMMITS" ]; then
-          ALL_COMMITS="$NEW_COMMIT"
-        else
-          ALL_COMMITS="$EXISTING_COMMITS, $NEW_COMMIT"
-        fi
-        
-        echo "::set-output name=all_commits::$ALL_COMMITS"
-
-    - name: Update Existing Task in Notion with Concatenated Commits
-      if: steps.check_notion_task.outputs.task_exists == 'true'
-      env:
-        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        PAGE_ID: ${{ steps.check_notion_task.outputs.page_id }}
-        ALL_COMMITS: ${{ steps.get_existing_commits.outputs.all_commits }}
+        COMMIT_ID: ${{ steps.commit_id.outputs.commit_id }}
       run: |
         JSON='{
           "properties": {
@@ -136,14 +114,13 @@ jobs:
               "rich_text": [
                 {
                   "text": {
-                    "content": "'"$ALL_COMMITS"'"
+                    "content": "'"$COMMIT_ID"'"
                   }
                 }
               ]
             }
           }
         }'
-        
         curl -X PATCH "https://api.notion.com/v1/pages/$PAGE_ID" \
           -H "Authorization: Bearer $NOTION_TOKEN" \
           -H "Content-Type: application/json" \
